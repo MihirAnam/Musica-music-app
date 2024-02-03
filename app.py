@@ -10,7 +10,7 @@ app.secret_key = 'BAD_SECRET_KEY'
 @app.route("/")
 @app.route("/index")
 def open():
-    path = str(Path.home() / "Downloads")
+    path = str(Path.home())
     file=os.listdir(path)
     dlist=filterdownload(file)
     dlist=dlist[0:5]
