@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  <link rel="stylesheet" href="static/style/homestyle.css">
+<script>
+  function test(){
+    document.getElementById('player').play();
+}
+
+window.onload = function(){
+  document.getElementById('btn').click();
+  
+var scriptTag = document.createElement("script");
+scriptTag.src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js";
+document.getElementsByTagName("head")[0].appendChild(scriptTag);
+}
+</script>
+<title>musica</title>
+</head>
+<body>
+
+  <!-- About Musica -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">About Musica</h4>
+        </div>
+        <div class="modal-body">
+          <p>Hello,<br>I am Musica , I am Designed and Developed by Mihir Anam. <br><br>I am a music player, You can search and listen your favourate songs, You can also Download any song and play offline.<br><br>In watchlist you can add your song and listen whenever you want.<br><br>Thanks,<br>Musica</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+<!-- main Music Box -->
+<div class="music-app">
+  <div class="cover">
+    <div class="cover-title">
+    </div>
+    <!-- search box -->
+    <div class="artist">
+      <form action="/search" method="get">
+        <div class="search-wrapper">
+            <div class="input-holder">
+                <input type="text" name="searchmusic" class="search-input"  placeholder="Search your music.." />
+                <button type="submit" name="submit" class="search-icon" onclick="searchToggle(this, event);"><i class="fa fa-search" aria-hidden="true" style="color:#FFF; font-size: 20px;"></i></button>
+            </div>
+            <div class="result-container">
+            </div>
+        </div>
+    </form>
+    
+<!-- top nav buttons -->
+    </div>
+    <button class="btn btn-search" data-toggle="modal" data-target="#myModal" style="margin-right: 160px;">
+      i
+    </button>
+    <a href="/view_watchlist?email={{session['email']}}">
+    <button class="btn btn-search" style="margin-right: 80px;">
+      <i class="fa fa-heartbeat" aria-hidden="true"></i>
+    </button>
+    </a>
+    <a href="/downloads">
+    <button class="btn btn-search" style="margin-right: 120px;">
+      <i class="fa fa-download" aria-hidden="true"></i>
+    </button>
+    </a>
+    <a href="/radio">
+      <button class="btn btn-search" style="margin-right: 160px;">
+        <i class="fa fa-podcast" aria-hidden="true"></i>
+      </button>
+      </a>
+    <a href="/">
+    <button class="btn btn-search" style="margin-right: 40px;">
+      <i class="fa fa-home" aria-hidden="true"></i>
+    </button>
+    </a>
+    {% if session['email'] %}
+    <a href="/logout">
+      <button class="btn btn-search" >
+        <i class="fa fa-sign-out" aria-hidden="true"></i>
+      </button>
+      </a>
+    {% else %}
+    <a href="/regpage">
+      <button class="btn btn-search" >
+        <i class="fa fa-sign-in" aria-hidden="true"></i>
+      </button>
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- music box content  -->
+
+  <div class="content">
+    {% if image=="show" %}
+    <center><img src="static/images/home.png" style="border-radius:15px; margin:20px; width:90%;">
+    <div class="row" style="margin-right:0px; margin-left: 0px;" >
+      <div class="col-md-6">
+        <a href="/downloads"><img src="static/images/downloads.png" style="border-radius:15px; margin:25px; width:80%;"></a>
+      </div>
+      <div class="col-md-6">
+        <a href="/view_watchlist?email={{session['email']}}"><img src="static/images/watchlist.png" style="border-radius:15px; margin:25px; width:80%;"></a>
+      </div>
+    </div>
+  </center>
+  <!-- Home page downloaded songs  -->
+  {% if dlisthome %}
+    <div class="content-header">
+      <span class="content-title">Downloads / Offline Songs </span>
+      <a href="/downloads" class="btn-all"> all songs</a>
+    </div>
+    {% endif %}
+    <ul class="playlist">
+      
+      {% for i in dlisthome %}
+      <a href="/playoffline?link={{i}}" style="text-decoration: none;">
+      <li class="list-item">
+        <img class="list-item-image" src="https://cdn.dribbble.com/users/4583/screenshots/91858/shot_1292800903.png" alt="song">
+        <div class="list-item-info">
+          <div class="info-title">{{i}}</div>
+          <div class="info-subtitle">musica</div>
+        </div>
+      </li>
+      </a>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <!-- search results  -->
+    <div class="content-header">
+      <span class="content-title">{% if r=="Results:" %} Results: {% endif %}</span>
+      <!-- <button class="btn-all">all songs</button> -->
+    </div>
+    <ul class="playlist">
+
+      {% for i in answer1 %}
+      <a href="/play?link={{answer1[i][0]}}&image={{answer1[i][1]}}" style="text-decoration: none;">
+      <li class="list-item">
+        
+        <img class="list-item-image" src="{{answer1[i][1]}}" alt="song">
+        <div class="list-item-info">
+          <div class="info-title">{{i}}</div>
+          <div class="info-subtitle">musica </div>
+        </div>
+        <div class="btn-add">
+        <form action="/add" method="post" >
+          <input type="hidden" name="email" value="{{session['email']}}">
+          <input type="hidden" name="song_name" value="{{i}}">
+          <input type="hidden" name="url" value="{{answer1[i][0]}}">
+        <button type="submit" name="submit">
+          <i class="fa fa-plus" aria-hidden="true" style="color: white;"></i>
+        </button>
+        </form>
+        <form action="/dloffline" method="post">
+          <input type="hidden" name="url" value="{{answer1[i]}}">
+        <button type="submit" name="submit">
+          <i class="fa fa-download" aria-hidden="true" style="color: white;"></i>
+        </button>
+        </form>
+        </div>
+      </li>
+    </a>
+      {% endfor %}
+    </ul>
+
+
+    {% if w=="watchlist" %}
+    <div class="content-header">
+      <span class="content-title">Watchlist</span>  
+    </div>
+    {% endif %}
+    <ul class="playlist">
+      {% for i in wlist %}
+      <a href="/play?link={{i[1]}}&image=https://cdn.dribbble.com/users/4583/screenshots/91858/shot_1292800903.png" style="text-decoration: none;">
+      <li class="list-item">
+        <img class="list-item-image" src="https://cdn.dribbble.com/users/4583/screenshots/91858/shot_1292800903.png" alt="song">
+        <div class="list-item-info">
+          <div class="info-title">{{i[0]}}</div>
+          <div class="info-subtitle">musica</div>
+        </div>
+        <form action="/removewatchlist" method="post" class="btn-add">
+          <input type="hidden" name="email" value="{{session['email']}}">
+          <input type="hidden" name="song_name" value="{{i[0]}}">
+        <button type="submit" name="submit">
+          <i class="fa fa-times" aria-hidden="true" style="color: white;"></i>
+        </button>
+        </form>
+      </li>
+      </a>
+      {% endfor %}
+    </ul>
+    
+
+<!-- downloaded songs list -->
+    {% if d=="downloads" %}
+    <div class="content-header">
+      <span class="content-title">Downloads / Offline Songs</span>
+    </div>
+    {% endif %}
+    <ul class="playlist">
+      {% for i in downloads %}
+      <a href="/playoffline?link={{i}}" style="text-decoration: none;">
+      <li class="list-item">
+        <img class="list-item-image" src="https://cdn.dribbble.com/users/4583/screenshots/91858/shot_1292800903.png" alt="song">
+        <div class="list-item-info">
+          <div class="info-title">{{i}}</div>
+          <div class="info-subtitle">musica</div>
+        </div> 
+      </li>
+      </a>
+      {% endfor %}
+    </ul>
+
+
+<!--  radio list -->
+{% if radio=="show" %}
+<div class="content-header">
+  <span class="content-title">Radio</span>
+</div>
+<ul class="playlist">
+  <a href="/playradio?rname=Ambient &link=https://www.partyviberadio.com:8069/;listen.pls?sid=1" style="text-decoration: none;">
+  <li class="list-item">
+    <img class="list-item-image" src="https://www.abc.net.au/cm/rimage/12872170-1x1-large.png?v=5" alt="song">
+    <div class="list-item-info">
+      <div class="info-title">Ambient</div>
+      <div class="info-subtitle">musica</div>
+    </div> 
+  </li>
+  </a>
+
+  <a href="/playradio?rname=drum & bass &link=https://www.partyviberadio.com:8061/;listen.pls?sid=1" style="text-decoration: none;">
+    <li class="list-item">
+      <img class="list-item-image" src="https://www.abc.net.au/cm/rimage/12872170-1x1-large.png?v=5" alt="song">
+      <div class="list-item-info">
+        <div class="info-title">drum & bass</div>
+        <div class="info-subtitle">musica</div>
+      </div> 
+    </li>
+    </a>
+
+    <a href="/playradio?rname=Dubstep &link=https://www.partyvibe.com:8067/;listen.pls?sid=1" style="text-decoration: none;">
+      <li class="list-item">
+        <img class="list-item-image" src="https://www.abc.net.au/cm/rimage/12872170-1x1-large.png?v=5" alt="song">
+        <div class="list-item-info">
+          <div class="info-title">Dubstep</div>
+          <div class="info-subtitle">musica</div>
+        </div> 
+      </li>
+      </a>
+
+      <a href="/playradio?rname=Jazz &link=https://www.partyviberadio.com:8064/;listen.pls?sid=1" style="text-decoration: none;">
+        <li class="list-item">
+          <img class="list-item-image" src="https://www.abc.net.au/cm/rimage/12872170-1x1-large.png?v=5" alt="song">
+          <div class="list-item-info">
+            <div class="info-title">Jazz</div>
+            <div class="info-subtitle">musica</div>
+          </div> 
+        </li>
+        </a>
+
+        <a href="/playradio?rname=Pop &link=http://www.partyvibe.com:8065/;listen.pls?sid=1" style="text-decoration: none;">
+          <li class="list-item">
+            <img class="list-item-image" src="https://www.abc.net.au/cm/rimage/12872170-1x1-large.png?v=5" alt="song">
+            <div class="list-item-info">
+              <div class="info-title">Pop</div>
+              <div class="info-subtitle">musica</div>
+            </div> 
+          </li>
+          </a>
+
+          <a href="/playradio?rname=PSYCHEDELIC TRANCE  &link=https://www.partyvibe.com:8062/;listen.pls?sid=1" style="text-decoration: none;">
+            <li class="list-item">
+              <img class="list-item-image" src="https://www.abc.net.au/cm/rimage/12872170-1x1-large.png?v=5" alt="song">
+              <div class="list-item-info">
+                <div class="info-title">PSYCHEDELIC TRANCE </div>
+                <div class="info-subtitle">musica</div>
+              </div> 
+            </li>
+            </a>
+
+            <a href="/playradio?rname=Rap &link=https://www.partyvibe.com:8063/;listen.pls?sid=1" style="text-decoration: none;">
+              <li class="list-item">
+                <img class="list-item-image" src="https://www.abc.net.au/cm/rimage/12872170-1x1-large.png?v=5" alt="song">
+                <div class="list-item-info">
+                  <div class="info-title">Rap </div>
+                  <div class="info-subtitle">musica</div>
+                </div> 
+              </li>
+              </a>
+
+              <a href="/playradio?rname=Rock &link=https://partyviberadio.com:8066/;listen.pls?sid=1" style="text-decoration: none;">
+                <li class="list-item">
+                  <img class="list-item-image" src="https://www.abc.net.au/cm/rimage/12872170-1x1-large.png?v=5" alt="song">
+                  <div class="list-item-info">
+                    <div class="info-title">Rock </div>
+                    <div class="info-subtitle">musica</div>
+                  </div> 
+                </li>
+                </a>
+
+                
+</ul>
+{% endif %}
+
+</div>
+
+
+  <!-- music player online -->
+  {% for i in music_list %}
+  <div class="player">
+    <button class="btn btn-extend">
+    </button>
+    <marquee width="100%" direction="left" style="margin-top:10px ; margin-bottom: 10px;">
+      Playing <i class="fa fa-arrow-right" aria-hidden="true"></i> {{i}}
+      </marquee>
+    <div class="player-top-content"></div>
+  </div>
+  <div class="player-screen">
+    <button class="btn btn-close">
+    </button>
+    <span class="top-text">Now Playing</span>
+    <div class="cover-wrapper">
+      <img class="cover-shadow" src="https://images.unsplash.com/photo-1588465023238-f8951f48a1ff?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80">
+      <img  class="cover-img" src="{{imagelink}}">
+    </div>
+    <center>
+    <div class="song-info">
+      <marquee width="100%" direction="left" style="margin-top:50px ;  color: #fff;">
+        {{i}}
+      </marquee>
+      <p class="song-subtitle">musica</p>
+    </div>
+    <audio id="player" controls class="audio1" style="margin-top: 25px;" >
+      <source src="static/audio/{{i}}" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+    <button id="btn" onclick="test()"></button>
+    </center>
+  </div>
+  {% endfor %}
+
+  
+  <!-- music  player offline downloaded  -->
+  {% if play=="offline" %}
+  <div class="player">
+    <button class="btn btn-extend">
+    </button>
+    <marquee width="100%" direction="left" style="margin-top:10px ; margin-bottom: 10px;">
+      Playing <i class="fa fa-arrow-right" aria-hidden="true"></i> {{offlineurl}}
+      </marquee>
+      <div class="player-top-content"></div>
+  </div>
+  <div class="player-screen">
+    <button class="btn btn-close">
+    </button>
+    <span class="top-text">Now Playing</span>
+    <div class="cover-wrapper">
+      <img class="cover-shadow" src="https://images.unsplash.com/photo-1588465023238-f8951f48a1ff?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80">
+      <img  class="cover-img" src="https://cdn.dribbble.com/users/4583/screenshots/91858/shot_1292800903.png">
+    </div>
+    <center>
+    <div class="song-info">
+      <marquee width="100%" direction="left" style="margin-top:50px ;  color: #fff;">
+        {{offlineurl}}
+      </marquee>
+      <p class="song-subtitle">musica</p>
+    </div>
+    <audio id="player" controls class="audio1" style="margin-top: 25px;" >
+      <source src="static/downloads/song.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+    <button id="btn" onclick="test()"></button>
+    </center>
+  </div>
+  {% endif %} 
+
+
+
+  <!-- music  player offline downloaded  -->
+  {% if play=="radio" %}
+  <div class="player">
+    <button class="btn btn-extend">
+    </button>
+    <marquee width="100%" direction="left" style="margin-top:10px ; margin-bottom: 10px;">
+      Playing <i class="fa fa-arrow-right" aria-hidden="true"></i> {{rname}}
+      </marquee>
+      <div class="player-top-content"></div>
+  </div>
+  <div class="player-screen">
+    <button class="btn btn-close">
+    </button>
+    <span class="top-text">Now Playing</span>
+    <div class="cover-wrapper">
+      <img class="cover-shadow" src="https://images.unsplash.com/photo-1588465023238-f8951f48a1ff?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80">
+      <img  class="cover-img" src="https://www.abc.net.au/cm/rimage/12872170-1x1-large.png?v=5">
+    </div>
+    <center>
+    <div class="song-info">
+      <marquee width="100%" direction="left" style="margin-top:50px ;  color: #fff;">
+        {{rname}}
+      </marquee>
+      <p class="song-subtitle">musica</p>
+    </div>
+    <audio id="player" controls class="audio1" style="margin-top: 25px;" >
+      <source src="{{url}}" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+    <button id="btn" onclick="test()"></button>
+    </center>
+  </div>
+  {% endif %} 
+
+
+
+</div>
+
+
+<!-- alerts -->
+{% if login=="sucessful" %}
+  <script>
+      alert("Login Sucessfull");
+    </script>
+  {% endif %}
+
+  {% if register=="sucessful" %}
+  <script>
+      alert("Registered Sucessfully");
+    </script>
+  {% endif %}
+
+  {% if watchlist=="added" %}
+  <script>
+      alert("Added to watchlist sucessfully");
+    </script>
+  {% endif %}
+
+<!-- scripts -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
+  <script  src="static/style/homescript.js"></script>
+  
+</body>
+</html>
