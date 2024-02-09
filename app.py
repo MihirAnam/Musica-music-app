@@ -51,7 +51,7 @@ def reg():
 def login():
     email=request.form['email']
     password=request.form['password']
-    t=(email,password)
+    t=[email,password]
     session['email']=email
     
     l=log(email)
